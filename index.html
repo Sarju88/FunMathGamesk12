@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PlayX Gaming Hub</title>
 
+<script>
+const params = new URLSearchParams(window.location.search);
+const pass = params.get("password");
+
+if(pass !== "iwantgames"){
+    window.location.href = "ban.html";
+}
+</script>
+
 <style>
 
 body{
@@ -73,24 +82,6 @@ display:none;
 margin-top:15px;
 }
 
-#granted{
-display:none;
-margin-top:18px;
-border:1px solid #39ff14;
-padding:12px;
-text-align:left;
-background:#000;
-}
-
-.line{
-opacity:0;
-animation:fadeLine .4s forwards;
-}
-
-@keyframes fadeLine{
-to{opacity:1}
-}
-
 </style>
 </head>
 
@@ -105,14 +96,12 @@ to{opacity:1}
 
 <div id="terminal"></div>
 
-<input id="code" type="password" placeholder="Enter elite access code">
+<input id="code" type="password" placeholder="Enter elite password">
 
 <button onclick="auth()">ENTER</button>
 
 <div id="loading">Authenticating...</div>
 <div id="status"></div>
-
-<div id="granted"></div>
 
 </div>
 </div>
@@ -132,41 +121,12 @@ setTimeout(type,40);
 
 type();
 
-function showGrantedSequence(){
-
-const granted=document.getElementById("granted");
-
-const lines=[
-"[ OK ] Code verified",
-"[ OK ] Successful login",
-"[ OK ] Loading PlayX modules",
-"[ OK ] Syncing session",
-"[ OK ] Welcome to PlayX Gaming Hub"
-];
-
-granted.innerHTML="";
-granted.style.display="block";
-
-lines.forEach((text,idx)=>{
-
-const div=document.createElement("div");
-div.className="line";
-div.style.animationDelay=(idx*300)+"ms";
-div.innerText=text;
-
-granted.appendChild(div);
-
-});
-
-}
-
 function auth(){
 
 const encoded="VGgzQ2ghaWNrM25pczBuRiFyMw==";
 const input=document.getElementById("code").value;
 
 document.getElementById("status").innerText="";
-document.getElementById("granted").style.display="none";
 document.getElementById("loading").style.display="block";
 
 setTimeout(()=>{
@@ -175,7 +135,6 @@ document.getElementById("loading").style.display="none";
 
 if(input===atob(encoded)){
 document.getElementById("status").innerText="Successful login";
-showGrantedSequence();
 }else{
 document.getElementById("status").innerText="Access denied";
 }
