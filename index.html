@@ -15,122 +15,105 @@
   </script>
 
   <style>
-    *{
-      box-sizing:border-box;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: #020402;
+      color: #39ff14;
+      overflow: hidden;
     }
 
-    body{
-      margin:0;
-      font-family:monospace;
-      background:#020402;
-      color:#39ff14;
-      overflow:hidden;
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
     }
 
-    canvas{
-      position:fixed;
-      inset:0;
-      z-index:0;
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      width: min(92vw, 380px);
     }
 
-    .center{
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      z-index:2;
-      width:min(92vw, 380px);
+    .card {
+      background: #0a120a;
+      border: 1px solid #39ff14;
+      box-shadow: 0 0 25px rgba(57,255,20,.45);
+      padding: 36px;
+      text-align: center;
     }
 
-    .card{
-      background:#0a120a;
-      border:1px solid #39ff14;
-      box-shadow:0 0 25px rgba(57,255,20,.45);
-      padding:36px;
-      text-align:center;
+    h1 {
+      margin: 0 0 18px 0;
+      font-size: 30px;
+      text-shadow: 0 0 10px rgba(57,255,20,.4);
     }
 
-    h1{
-      margin:0 0 18px 0;
-      font-size:30px;
-      letter-spacing:.5px;
-      text-shadow:0 0 10px rgba(57,255,20,.4);
+    #terminal {
+      min-height: 24px;
+      margin-bottom: 18px;
+      color: #9dff8b;
     }
 
-    #terminal{
-      min-height:24px;
-      margin-bottom:18px;
-      color:#9dff8b;
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0;
+      background: #000;
+      border: 1px solid #39ff14;
+      color: #39ff14;
+      outline: none;
+      font-family: monospace;
+      font-size: 15px;
     }
 
-    input{
-      width:100%;
-      padding:12px 14px;
-      margin:10px 0;
-      background:#000;
-      border:1px solid #39ff14;
-      color:#39ff14;
-      outline:none;
-      font-family:monospace;
-      font-size:15px;
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #39ff14;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 15px;
+      cursor: pointer;
     }
 
-    input:focus{
-      box-shadow:0 0 0 3px rgba(57,255,20,.12);
+    #loading {
+      display: none;
+      margin-top: 14px;
+      color: #caffc0;
     }
 
-    button{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      background:#39ff14;
-      border:none;
-      color:#000;
-      font-weight:bold;
-      font-family:monospace;
-      font-size:15px;
-      cursor:pointer;
+    #status {
+      margin-top: 12px;
+      min-height: 24px;
+      font-weight: bold;
     }
 
-    button:hover{
-      filter:brightness(1.05);
+    #granted {
+      display: none;
+      margin-top: 16px;
+      text-align: left;
+      background: #000;
+      border: 1px solid #39ff14;
+      padding: 12px;
+      color: #baffad;
     }
 
-    #loading{
-      display:none;
-      margin-top:14px;
-      color:#caffc0;
+    .line {
+      opacity: 0;
+      animation: fadeLine .35s forwards;
     }
 
-    #status{
-      margin-top:12px;
-      min-height:24px;
-      font-weight:bold;
-    }
-
-    #granted{
-      display:none;
-      margin-top:16px;
-      text-align:left;
-      background:#000;
-      border:1px solid #39ff14;
-      padding:12px;
-      color:#baffad;
-    }
-
-    .line{
-      opacity:0;
-      animation:fadeLine .35s forwards;
-    }
-
-    @keyframes fadeLine{
-      to{ opacity:1; }
-    }
-
-    .hint{
-      margin-top:14px;
-      color:#7ecf75;
-      font-size:12px;
+    @keyframes fadeLine {
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -143,13 +126,11 @@
       <div id="terminal"></div>
 
       <input id="code" type="password" placeholder="Enter elite password" />
-      <button onclick="auth()">ENTER</button>
+      <button id="enterBtn">ENTER</button>
 
       <div id="loading">Authenticating...</div>
       <div id="status"></div>
       <div id="granted"></div>
-
-      <div class="hint">VIP node access portal</div>
     </div>
   </div>
 
@@ -210,38 +191,36 @@
       try {
         const inputHash = await sha256(input);
 
-        setTimeout(() => {
-          loading.style.display = "none";
+        loading.style.display = "none";
 
-          if (inputHash === correctHash) {
-            status.textContent = "Successful login";
-            showGrantedSequence();
-          } else {
-            status.textContent = "Access denied";
-          }
-        }, 900);
+        if (inputHash === correctHash) {
+          status.textContent = "Successful login";
+          showGrantedSequence();
+        } else {
+          status.textContent = "Access denied";
+        }
       } catch (err) {
         loading.style.display = "none";
         status.textContent = "Hash check failed";
+        console.error(err);
       }
     }
 
+    document.getElementById("enterBtn").addEventListener("click", auth);
+    document.getElementById("code").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") auth();
+    });
+
     const c = document.getElementById("matrix");
     const ctx = c.getContext("2d");
+    const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const fontSize = 16;
+    let drops = [];
 
     function resizeCanvas() {
       c.width = window.innerWidth;
       c.height = window.innerHeight;
-      resetDrops();
-    }
-
-    const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const fontSize = 16;
-    let columns = 0;
-    let drops = [];
-
-    function resetDrops() {
-      columns = Math.floor(c.width / fontSize);
+      const columns = Math.floor(c.width / fontSize);
       drops = Array(columns).fill(1);
     }
 
