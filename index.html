@@ -107,27 +107,6 @@
       font-weight: bold;
     }
 
-    #granted {
-      display: none;
-      margin-top: 16px;
-      text-align: left;
-      background: #000;
-      border: 1px solid #39ff14;
-      padding: 12px;
-      color: #baffad;
-    }
-
-    .line {
-      opacity: 0;
-      animation: fadeLine 0.35s forwards;
-    }
-
-    @keyframes fadeLine {
-      to {
-        opacity: 1;
-      }
-    }
-
     .hint {
       margin-top: 14px;
       color: #7ecf75;
@@ -148,7 +127,6 @@
 
       <div id="loading">Authenticating...</div>
       <div id="status"></div>
-      <div id="granted"></div>
 
       <div class="hint">VIP node access portal</div>
     </div>
@@ -182,42 +160,16 @@
       return null;
     }
 
+    if (getCookie("playx_auth") === "true") {
+      window.location.replace("dashboard.html");
+    }
+
     async function sha256(text) {
       const encoder = new TextEncoder();
       const data = encoder.encode(text);
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
-    function showGrantedSequence(sessionRestored = false) {
-      const granted = document.getElementById("granted");
-      const lines = sessionRestored
-        ? [
-            "[ OK ] Session cookie found",
-            "[ OK ] Session restored",
-            "[ OK ] Loading PlayX modules",
-            "[ OK ] Syncing elite session",
-            "[ OK ] Welcome back to PlayX Gaming Hub"
-          ]
-        : [
-            "[ OK ] Password hash verified",
-            "[ OK ] Successful login",
-            "[ OK ] Session cookie created",
-            "[ OK ] Loading PlayX modules",
-            "[ OK ] Welcome to PlayX Gaming Hub"
-          ];
-
-      granted.innerHTML = "";
-      granted.style.display = "block";
-
-      lines.forEach((text, idx) => {
-        const div = document.createElement("div");
-        div.className = "line";
-        div.style.animationDelay = (idx * 250) + "ms";
-        div.textContent = text;
-        granted.appendChild(div);
-      });
     }
 
     async function auth() {
@@ -228,21 +180,17 @@
 
       const loading = document.getElementById("loading");
       const status = document.getElementById("status");
-      const granted = document.getElementById("granted");
 
       status.textContent = "";
-      granted.style.display = "none";
       loading.style.display = "block";
 
       try {
         const inputHash = await sha256(input);
-
         loading.style.display = "none";
 
         if (inputHash === correctHash) {
           setSessionCookie("playx_auth", "true");
-          status.textContent = "Successful login";
-          showGrantedSequence(false);
+          window.location.replace("dashboard.html");
         } else {
           status.textContent = "Access denied";
         }
@@ -251,11 +199,6 @@
         status.textContent = "Hash check failed";
         console.error(err);
       }
-    }
-
-    if (getCookie("playx_auth") === "true") {
-      document.getElementById("status").textContent = "Session restored";
-      showGrantedSequence(true);
     }
 
     document.getElementById("enterBtn").addEventListener("click", auth);
