@@ -145,7 +145,7 @@
       <div class="terminal-box" id="terminalBox"></div>
 
       <div class="buttons">
-        <button class="nav-btn" onclick="showSection('games')">Games</button>
+        <button class="nav-btn" onclick="window.location.href='/PlayX/gamedashboard.html'">Games</button>
         <button class="nav-btn" onclick="showSection('credits')">Credits</button>
         <button class="nav-btn" onclick="showSection('about')">About Me</button>
       </div>
@@ -164,16 +164,6 @@
     ];
 
     const sections = {
-      games: `
-        <h2>Games</h2>
-        <p>Welcome to the PlayX game library.</p>
-        <ul>
-          <li>Featured title slot 01</li>
-          <li>Featured title slot 02</li>
-          <li>Featured title slot 03</li>
-          <li>VIP updates and upcoming releases</li>
-        </ul>
-      `,
       credits: `
         <h2>Credits</h2>
         <p>PlayX Gaming Hub was built with a neon cyber style and a custom client-side session flow.</p>
@@ -186,8 +176,8 @@
       `,
       about: `
         <h2>About Me</h2>
-        <p>This is your custom about section.</p>
-        <p>You can replace this text with your own bio, gaming goals, favorite games, links, or creator info.</p>
+        <p>My name is the PlayX Admin</p>
+        <p>I made this website with teh intention of making games accessible to everyone</p>
       `
     };
 
@@ -204,7 +194,7 @@
     }
 
     typeTerminalLines(terminalLines);
-    showSection("games");
+    showSection("credits");
 
     const c = document.getElementById("matrix");
     const ctx = c.getContext("2d");
